@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Fraseario de Paloyo y amigos</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 30px 20px;
+      background: #111116;
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .contenedor {
+      max-width: 950px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 42px;
+      margin-bottom: 8px;
+    }
+
+    .subtitulo {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 12px;
+    }
+
+    #contador {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 25px;
+    }
+
+    .controles {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #aleatoria {
+      display: none;
+      background: #25252d;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      text-align: center;
+      font-size: 22px;
+    }
+
+    .frase {
+      background: #1c1c22;
+      padding: 17px;
+      margin-bottom: 10px;
+      border-radius: 9px;
+      font-size: 18px;
+    }
+
+    .numero {
+      font-weight: bold;
+      color: #aaa;
+      margin-right: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .controles {
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="contenedor">
+
+    <h1>📜 Fraseario de Paloyo y amigos</h1>
+
+    <div class="subtitulo">
+      Grandes frases dichas en directo que probablemente era mejor no recordar
+    </div>
+
+    <div id="contador">
+      Cargando frases...
+    </div>
+
+    <div class="controles">
+
+      <input
+        id="buscar"
+        type="text"
+        placeholder="🔎 Buscar una frase..."
+      >
+
+      <button onclick="fraseAleatoria()">
+        🎲 Frase aleatoria
+      </button>
+
+    </div>
+
+    <div id="aleatoria"></div>
+
+    <div id="lista"></div>
+
+  </div>
+
+
+  <script>
+
+    let frases = [];
+
+    fetch("frases.txt")
+      .then(respuesta => respuesta.text())
+      .then(texto => {
+
+        frases = texto
+          .split(/\r?\n/)
+          .map(frase => frase.trim())
+          .filter(frase => frase.length > 0);
+
+        document.getElementById("contador").innerText =
+          "🎙️ " + frases.length + " frases guardadas";
+
+        mostrarFrases(frases);
+
+      });
+
+
+    function mostrarFrases(lista) {
+
+      const contenedor =
+        document.getElementById("lista");
+
+      contenedor.innerHTML = "";
+
+      lista.forEach(item => {
+
+        const numero =
+          frases.indexOf(item) + 1;
+
+        const div =
+          document.createElement("div");
+
+        div.className = "frase";
+
+        const spanNumero =
+          document.createElement("span");
+
+        spanNumero.className = "numero";
+        spanNumero.textContent = "#" + numero;
+
+        const spanFrase =
+          document.createElement("span");
+
+        spanFrase.textContent = item;
+
+        div.appendChild(spanNumero);
+        div.appendChild(spanFrase);
+
+        contenedor.appendChild(div);
+
+      });
+
+    }
+
+
+    document
+      .getElementById("buscar")
+      .addEventListener("input", function() {
+
+        const texto =
+          this.value.toLowerCase();
+
+        const resultado =
+          frases.filter(frase =>
+            frase.toLowerCase().includes(texto)
+          );
+
+        mostrarFrases(resultado);
+
+      });
+
+
+    function fraseAleatoria() {
+
+      if (frases.length === 0) {
+        return;
+      }
+
+      const numero =
+        Math.floor(Math.random() * frases.length);
+
+      const caja =
+        document.getElementById("aleatoria");
+
+      caja.style.display = "block";
+
+      caja.textContent =
+        "🎲 #" +
+        (numero + 1) +
+        " — “" +
+        frases[numero] +
+        "”";
+
+    }
+
+  </script>
+
+</body>
+</html>
