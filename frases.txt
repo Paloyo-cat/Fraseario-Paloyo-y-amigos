@@ -9,3 +9,4 @@ Prueba de sincronización web
 Prueba GitHub automatica
 paloyo | hola que tal
 Paloyo | Paloyo ser de luz
+Paloyo | La viruela del moco
