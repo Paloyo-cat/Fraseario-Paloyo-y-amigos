@@ -89,13 +89,13 @@
       margin-right: 12px;
     }
 
-    .autor {
-      font-weight: bold;
-      margin-right: 6px;
-    }
-
     .texto-frase {
       color: #eee;
+    }
+
+    .autor {
+      font-weight: bold;
+      margin-left: 8px;
     }
 
     @media (max-width: 600px) {
@@ -129,7 +129,7 @@
       <input
         id="buscar"
         type="text"
-        placeholder="🔎 Buscar frase o autor..."
+        placeholder="🔎 Buscar frase, autor o año..."
       >
 
       <button onclick="fraseAleatoria()">
@@ -153,27 +153,44 @@
       .then(respuesta => respuesta.text())
       .then(texto => {
 
-         const lineas = texto
+        const lineas = texto
           .split(/\r?\n/)
           .map(linea => linea.trim())
-          .filter(linea => linea.length > 0 && linea !== "#");
+          .filter(linea =>
+            linea.length > 0 &&
+            linea !== "#"
+          );
 
         frases = lineas.map((linea, indice) => {
 
+          const partes = linea.split("|");
+
+          let frase = "";
           let autor = "";
-          let frase = linea;
+          let anio = "";
 
-          const separador = linea.indexOf("|");
+          if (partes.length >= 3) {
 
-          if (separador >= 0) {
-            autor = linea.substring(0, separador).trim();
-            frase = linea.substring(separador + 1).trim();
+            frase = partes[0].trim();
+            autor = partes[1].trim();
+            anio = partes[2].trim();
+
+          } else if (partes.length === 2) {
+
+            frase = partes[0].trim();
+            autor = partes[1].trim();
+
+          } else {
+
+            frase = linea.trim();
+
           }
 
           return {
             numero: indice + 1,
+            frase: frase,
             autor: autor,
-            frase: frase
+            anio: anio
           };
 
         });
@@ -205,10 +222,22 @@
           document.createElement("span");
 
         spanNumero.className = "numero";
-        spanNumero.textContent = "#" + item.numero;
+        spanNumero.textContent =
+          "#" + item.numero;
+
+
+        const spanFrase =
+          document.createElement("span");
+
+        spanFrase.className =
+          "texto-frase";
+
+        spanFrase.textContent =
+          "“" + item.frase + "”";
 
 
         div.appendChild(spanNumero);
+        div.appendChild(spanFrase);
 
 
         if (item.autor !== "") {
@@ -216,21 +245,20 @@
           const spanAutor =
             document.createElement("span");
 
-          spanAutor.className = "autor";
-          spanAutor.textContent = item.autor + ":";
+          spanAutor.className =
+            "autor";
+
+          spanAutor.textContent =
+            " - " +
+            item.autor +
+            (item.anio !== ""
+              ? " " + item.anio
+              : "");
 
           div.appendChild(spanAutor);
 
         }
 
-
-        const spanFrase =
-          document.createElement("span");
-
-        spanFrase.className = "texto-frase";
-        spanFrase.textContent = "“" + item.frase + "”";
-
-        div.appendChild(spanFrase);
 
         contenedor.appendChild(div);
 
@@ -244,12 +272,29 @@
       .addEventListener("input", function() {
 
         const texto =
-          this.value.toLowerCase().trim();
+          this.value
+            .toLowerCase()
+            .trim();
 
         const resultado =
           frases.filter(item =>
-            item.frase.toLowerCase().includes(texto) ||
-            item.autor.toLowerCase().includes(texto)
+
+            item.frase
+              .toLowerCase()
+              .includes(texto)
+
+            ||
+
+            item.autor
+              .toLowerCase()
+              .includes(texto)
+
+            ||
+
+            item.anio
+              .toLowerCase()
+              .includes(texto)
+
           );
 
         mostrarFrases(resultado);
@@ -264,37 +309,51 @@
       }
 
       const indice =
-        Math.floor(Math.random() * frases.length);
+        Math.floor(
+          Math.random() *
+          frases.length
+        );
 
       const item =
         frases[indice];
 
       const caja =
-        document.getElementById("aleatoria");
+        document.getElementById(
+          "aleatoria"
+        );
 
-      caja.style.display = "block";
+      caja.style.display =
+        "block";
+
+
+      let texto =
+        "🎲 #" +
+        item.numero +
+        " “" +
+        item.frase +
+        "”";
+
 
       if (item.autor !== "") {
 
-        caja.textContent =
-          "🎲 #" +
-          item.numero +
-          " — " +
-          item.autor +
-          ": “" +
-          item.frase +
-          "”";
-
-      } else {
-
-        caja.textContent =
-          "🎲 #" +
-          item.numero +
-          " — “" +
-          item.frase +
-          "”";
+        texto +=
+          " - " +
+          item.autor;
 
       }
+
+
+      if (item.anio !== "") {
+
+        texto +=
+          " " +
+          item.anio;
+
+      }
+
+
+      caja.textContent =
+        texto;
 
     }
 
