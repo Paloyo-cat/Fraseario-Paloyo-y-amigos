@@ -153,10 +153,10 @@
       .then(respuesta => respuesta.text())
       .then(texto => {
 
-        const lineas = texto
+         const lineas = texto
           .split(/\r?\n/)
           .map(linea => linea.trim())
-          .filter(linea => linea.length > 0);
+          .filter(linea => linea.length > 0 && linea !== "#");
 
         frases = lineas.map((linea, indice) => {
 
